@@ -1,4 +1,4 @@
-# Sentinal
+# Sentinel
 A cloud-ready cybersecurity platform for monitoring authentication events, detecting suspicious login activity, and visualizing security alerts through an interactive dashboard.
 
 # Features (planned)

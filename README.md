@@ -1,2 +1,14 @@
-# sentinel-security-dashboard
-Sentinel is a cloud-ready web application that simulates a Security Information and Event Management (SIEM) platform by monitoring authentication activity, detecting suspicious login behavior, and visualizing security events through an interactive dashboard.
+# Sentinal
+A cloud-ready cybersecurity platform for monitoring authentication events, detecting suspicious login activity, and visualizing security alerts through an interactive dashboard.
+
+# Features (planned)
+Secure user authentication
+Password hashing
+Login activity logging
+Brute-force attack detection
+Suspicious IP monitoring
+Account lockout policies
+Security alerts dashboard
+Interactive charts and analytics
+Cloud deployment
+AI-generated security insights (planned)

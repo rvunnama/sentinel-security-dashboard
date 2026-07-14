@@ -27,3 +27,18 @@ def add_user(username, password_hash):
 
     connection.commit()
     connection.close()
+
+def get_user_by_username(username):
+    connection = sqlite3.connect("sentinel.db")
+    cursor = connection.cursor()
+
+    cursor.execute(
+        "SELECT * FROM users WHERE username = ?",
+        (username,)
+    )
+
+    user = cursor.fetchone()
+
+    connection.close()
+
+    return user

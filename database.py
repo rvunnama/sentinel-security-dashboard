@@ -6,10 +6,12 @@ def create_database():
     cursor = connection.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE IF NOT EXISTS login_attempts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL
+            username TEXT NOT NULL,
+            success INTEGER NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            ip_address TEXT NOT NULL
         )
     """)
 
@@ -42,3 +44,18 @@ def get_user_by_username(username):
     connection.close()
 
     return user
+
+def log_login_attempt(username, success, ip_address):
+    connection = sqlite3.connect("sentinel.db")
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO login_attempts (username, success, ip_address)
+        VALUES (?, ?, ?)
+        """,
+        (username, success, ip_address)
+    )
+
+    connection.commit()
+    connection.close()

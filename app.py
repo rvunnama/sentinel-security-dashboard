@@ -1,6 +1,11 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
-from database import create_database, add_user, get_user_by_username
+from database import (
+    create_database,
+    add_user,
+    get_user_by_username,
+    log_login_attempt
+)
 import sqlite3
 
 app = Flask(__name__)
@@ -32,14 +37,19 @@ def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
+        ip_address = request.remote_addr
 
         user = get_user_by_username(username)
 
         if user and check_password_hash(user[2], password):
+            log_login_attempt(username, 1, ip_address)
+
             session["user_id"] = user[0]
             session["username"] = user[1]
 
             return redirect(url_for("dashboard"))
+
+        log_login_attempt(username, 0, ip_address)
 
         return "Invalid username or password."
 

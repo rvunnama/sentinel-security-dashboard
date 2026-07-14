@@ -4,7 +4,8 @@ from database import (
     create_database,
     add_user,
     get_user_by_username,
-    log_login_attempt
+    log_login_attempt,
+    get_recent_login_attempts
 )
 import sqlite3
 
@@ -60,9 +61,12 @@ def dashboard():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    attempts = get_recent_login_attempts()
+
     return render_template(
         "dashboard.html",
-        username=session["username"]
+        username=session["username"],
+        attempts=attempts
     )
 
 @app.route("/logout")

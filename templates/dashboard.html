@@ -1,14 +1,37 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard | Sentinel</title>
-</head>
-
 <body>
     <h1>Sentinel Dashboard</h1>
 
     <p>Welcome, {{ username }}!</p>
 
+    <h2>Recent Login Activity</h2>
+
+    <table border="1">
+        <tr>
+            <th>Username</th>
+            <th>Status</th>
+            <th>Timestamp</th>
+            <th>IP Address</th>
+        </tr>
+
+        {% for attempt in attempts %}
+        <tr>
+            <td>{{ attempt[0] }}</td>
+
+            <td>
+                {% if attempt[1] == 1 %}
+                    Success
+                {% else %}
+                    Failed
+                {% endif %}
+            </td>
+
+            <td>{{ attempt[2] }}</td>
+            <td>{{ attempt[3] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+
     <a href="{{ url_for('logout') }}">Logout</a>
 </body>
-</html>

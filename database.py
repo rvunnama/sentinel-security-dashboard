@@ -57,5 +57,25 @@ def log_login_attempt(username, success, ip_address):
         (username, success, ip_address)
     )
 
+def get_recent_login_attempts(limit=10):
+    connection = sqlite3.connect("sentinel.db")
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT username, success, timestamp, ip_address
+        FROM login_attempts
+        ORDER BY timestamp DESC
+        LIMIT ?
+        """,
+        (limit,)
+    )
+
+    attempts = cursor.fetchall()
+
+    connection.close()
+
+    return attempts
+
     connection.commit()
     connection.close()

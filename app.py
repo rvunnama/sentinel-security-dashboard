@@ -67,8 +67,13 @@ def dashboard():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    status_filter = request.args.get("status")
+
+    if status_filter not in ["OPEN", "RESOLVED"]:
+        status_filter = None
+
     attempts = get_recent_login_attempts()
-    alerts = get_recent_security_alerts()
+    alerts = get_recent_security_alerts(status=status_filter)
     stats = get_dashboard_stats()
 
     return render_template(
@@ -76,7 +81,8 @@ def dashboard():
         username=session["username"],
         attempts=attempts,
         alerts=alerts,
-        stats=stats
+        stats=stats,
+        status_filter=status_filter
     )
 
 @app.route("/logout")

@@ -51,6 +51,18 @@
 
     <br>
 
+    <div class="filters">
+        <a href="{{ url_for('dashboard') }}">All</a>
+
+        <a href="{{ url_for('dashboard', status='OPEN') }}">
+            Open
+        </a>
+
+        <a href="{{ url_for('dashboard', status='RESOLVED') }}">
+            Resolved
+        </a>
+    </div>
+    
     <h2>Security Alerts</h2>
 
     <table>

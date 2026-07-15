@@ -51,20 +51,53 @@
 
     <br>
 
-    <div class="filters">
-        <a href="{{ url_for('dashboard') }}">All</a>
-
-        <a href="{{ url_for('dashboard', status='OPEN') }}">
-            Open
-        </a>
-
-        <a href="{{ url_for('dashboard', status='RESOLVED') }}">
-            Resolved
-        </a>
-    </div>
-    
     <h2>Security Alerts</h2>
+        <div class="filters">
+            <a href="{{ url_for('dashboard') }}">All</a>
 
+            <a href="{{ url_for('dashboard', status='OPEN') }}">
+                Open
+            </a>
+
+            <a href="{{ url_for('dashboard', status='RESOLVED') }}">
+                Resolved
+            </a>
+        </div>
+        <div class="filters">
+            <h3>Status</h3>
+
+            <a href="{{ url_for('dashboard', severity=severity_filter) }}">
+                All
+            </a>
+
+            <a href="{{ url_for('dashboard', status='OPEN', severity=severity_filter) }}">
+                Open
+            </a>
+
+            <a href="{{ url_for('dashboard', status='RESOLVED', severity=severity_filter) }}">
+                Resolved
+            </a>
+        </div>
+        
+        <div class="filters">
+            <h3>Severity</h3>
+
+            <a href="{{ url_for('dashboard', status=status_filter) }}">
+                All
+            </a>
+
+            <a href="{{ url_for('dashboard', status=status_filter, severity='HIGH') }}">
+                High
+            </a>
+
+            <a href="{{ url_for('dashboard', status=status_filter, severity='MEDIUM') }}">
+                Medium
+            </a>
+
+            <a href="{{ url_for('dashboard', status=status_filter, severity='LOW') }}">
+                Low
+            </a>
+        </div>
     <table>
         <tr>
             <th>Alert Type</th>

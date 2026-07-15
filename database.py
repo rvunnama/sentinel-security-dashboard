@@ -102,31 +102,30 @@ def create_security_alert(alert_type, severity, description):
             (alert_type, severity, description)
         )
 
-def get_recent_security_alerts(limit=10, status=None):
+def get_recent_security_alerts(limit=10, status=None, severity=None):
     with sqlite3.connect("sentinel.db", timeout=10) as connection:
         cursor = connection.cursor()
 
+        query = """
+            SELECT id, alert_type, severity, description, timestamp, status
+            FROM security_alerts
+            WHERE 1 = 1
+        """
+
+        parameters = []
+
         if status:
-            cursor.execute(
-                """
-                SELECT id, alert_type, severity, description, timestamp, status
-                FROM security_alerts
-                WHERE status = ?
-                ORDER BY timestamp DESC
-                LIMIT ?
-                """,
-                (status, limit)
-            )
-        else:
-            cursor.execute(
-                """
-                SELECT id, alert_type, severity, description, timestamp, status
-                FROM security_alerts
-                ORDER BY timestamp DESC
-                LIMIT ?
-                """,
-                (limit,)
-            )
+            query += " AND status = ?"
+            parameters.append(status)
+
+        if severity:
+            query += " AND severity = ?"
+            parameters.append(severity)
+
+        query += " ORDER BY timestamp DESC LIMIT ?"
+        parameters.append(limit)
+
+        cursor.execute(query, parameters)
 
         return cursor.fetchall()
 

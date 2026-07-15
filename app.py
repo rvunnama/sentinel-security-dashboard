@@ -68,12 +68,21 @@ def dashboard():
         return redirect(url_for("login"))
 
     status_filter = request.args.get("status")
+    severity_filter = request.args.get("severity")
 
     if status_filter not in ["OPEN", "RESOLVED"]:
         status_filter = None
 
+    if severity_filter not in ["HIGH", "MEDIUM", "LOW"]:
+        severity_filter = None
+
     attempts = get_recent_login_attempts()
-    alerts = get_recent_security_alerts(status=status_filter)
+
+    alerts = get_recent_security_alerts(
+        status=status_filter,
+        severity=severity_filter
+    )
+
     stats = get_dashboard_stats()
 
     return render_template(
@@ -82,7 +91,8 @@ def dashboard():
         attempts=attempts,
         alerts=alerts,
         stats=stats,
-        status_filter=status_filter
+        status_filter=status_filter,
+        severity_filter=severity_filter
     )
 
 @app.route("/logout")

@@ -5,7 +5,11 @@ from database import (
     add_user,
     get_user_by_username,
     log_login_attempt,
-    get_recent_login_attempts
+    get_recent_login_attempts,
+    count_recent_failed_attempts,
+    create_security_alert,
+    get_recent_security_alerts,
+    get_dashboard_stats
 )
 import sqlite3
 
@@ -52,8 +56,17 @@ def login():
 
         log_login_attempt(username, 0, ip_address)
 
-        return "Invalid username or password."
+        failed_attempts = count_recent_failed_attempts(username)
 
+        if failed_attempts == 5:
+            create_security_alert(
+                "Brute Force Attempt",
+                "HIGH",
+                f"Five failed login attempts detected for username '{username}' within 10 minutes."
+            )
+
+        return "Invalid username or password."
+    
     return render_template("login.html")
 
 @app.route("/dashboard")
@@ -62,11 +75,15 @@ def dashboard():
         return redirect(url_for("login"))
 
     attempts = get_recent_login_attempts()
+    alerts = get_recent_security_alerts()
+    stats = get_dashboard_stats()
 
     return render_template(
         "dashboard.html",
         username=session["username"],
-        attempts=attempts
+        attempts=attempts,
+        alerts=alerts,
+        stats=stats
     )
 
 @app.route("/logout")

@@ -6,12 +6,12 @@ def create_database():
     cursor = connection.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS login_attempts (
+        CREATE TABLE IF NOT EXISTS security_alerts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            success INTEGER NOT NULL,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-            ip_address TEXT NOT NULL
+            alert_type TEXT NOT NULL,
+            severity TEXT NOT NULL,
+            description TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
@@ -79,3 +79,95 @@ def get_recent_login_attempts(limit=10):
 
     connection.commit()
     connection.close()
+
+def count_recent_failed_attempts(username):
+    connection = sqlite3.connect("sentinel.db")
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT COUNT(*)
+        FROM login_attempts
+        WHERE username = ?
+        AND success = 0
+        AND timestamp >= datetime('now', '-10 minutes')
+        """,
+        (username,)
+    )
+
+    count = cursor.fetchone()[0]
+
+    connection.close()
+
+    return count
+
+def create_security_alert(alert_type, severity, description):
+    connection = sqlite3.connect("sentinel.db")
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO security_alerts (
+            alert_type,
+            severity,
+            description
+        )
+        VALUES (?, ?, ?)
+        """,
+        (alert_type, severity, description)
+    )
+
+    connection.commit()
+    connection.close()
+
+def get_recent_security_alerts(limit=10):
+    connection = sqlite3.connect("sentinel.db")
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT alert_type, severity, description, timestamp
+        FROM security_alerts
+        ORDER BY timestamp DESC
+        LIMIT ?
+        """,
+        (limit,)
+    )
+
+    alerts = cursor.fetchall()
+
+    connection.close()
+
+    return alerts
+
+def get_dashboard_stats():
+    connection = sqlite3.connect("sentinel.db")
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM login_attempts
+        WHERE success = 1
+    """)
+    successful_logins = cursor.fetchone()[0]
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM login_attempts
+        WHERE success = 0
+    """)
+    failed_logins = cursor.fetchone()[0]
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM security_alerts
+    """)
+    total_alerts = cursor.fetchone()[0]
+
+    connection.close()
+
+    return {
+        "successful_logins": successful_logins,
+        "failed_logins": failed_logins,
+        "total_alerts": total_alerts
+    }

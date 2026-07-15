@@ -11,7 +11,8 @@ def create_database():
             alert_type TEXT NOT NULL,
             severity TEXT NOT NULL,
             description TEXT NOT NULL,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            status TEXT NOT NULL DEFAULT 'OPEN'
         )
     """)
 
@@ -126,7 +127,7 @@ def get_recent_security_alerts(limit=10):
 
     cursor.execute(
         """
-        SELECT alert_type, severity, description, timestamp
+        SELECT id, alert_type, severity, description, timestamp, status
         FROM security_alerts
         ORDER BY timestamp DESC
         LIMIT ?
@@ -192,3 +193,19 @@ def count_recent_failed_attempts_by_ip(ip_address):
     connection.close()
 
     return count
+
+def resolve_security_alert(alert_id):
+    connection = sqlite3.connect("sentinel.db", timeout=10)
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        UPDATE security_alerts
+        SET status = 'RESOLVED'
+        WHERE id = ?
+        """,
+        (alert_id,)
+    )
+
+    connection.commit()
+    connection.close()

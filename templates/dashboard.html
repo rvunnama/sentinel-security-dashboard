@@ -53,20 +53,36 @@
 
     <h2>Security Alerts</h2>
 
-    <table border="1">
+    <table>
         <tr>
             <th>Alert Type</th>
             <th>Severity</th>
             <th>Description</th>
             <th>Timestamp</th>
+            <th>Status</th>
+            <th>Action</th>
         </tr>
 
         {% for alert in alerts %}
         <tr>
-            <td>{{ alert[0] }}</td>
             <td>{{ alert[1] }}</td>
             <td>{{ alert[2] }}</td>
             <td>{{ alert[3] }}</td>
+            <td>{{ alert[4] }}</td>
+            <td>{{ alert[5] }}</td>
+
+            <td>
+                {% if alert[5] == "OPEN" %}
+                    <form
+                        method="POST"
+                        action="{{ url_for('resolve_alert', alert_id=alert[0]) }}"
+                    >
+                        <button type="submit">Resolve</button>
+                    </form>
+                {% else %}
+                    Resolved
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </table>

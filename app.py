@@ -8,6 +8,7 @@ from database import (
     get_recent_login_attempts,
     get_recent_security_alerts,
     get_dashboard_stats,
+    resolve_security_alert
 )
 from detection import analyze_failed_login
 import sqlite3
@@ -83,6 +84,15 @@ def logout():
     session.clear()
 
     return redirect(url_for("login"))
+
+@app.route("/alerts/<int:alert_id>/resolve", methods=["POST"])
+def resolve_alert(alert_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    resolve_security_alert(alert_id)
+
+    return redirect(url_for("dashboard"))
 
 if __name__ == "__main__":
     create_database()

@@ -6,12 +6,10 @@ from database import (
     get_user_by_username,
     log_login_attempt,
     get_recent_login_attempts,
-    count_recent_failed_attempts,
-    create_security_alert,
     get_recent_security_alerts,
     get_dashboard_stats,
-    count_recent_failed_attempts_by_ip
 )
+from detection import analyze_failed_login
 import sqlite3
 
 app = Flask(__name__)
@@ -57,23 +55,7 @@ def login():
 
         log_login_attempt(username, 0, ip_address)
 
-        failed_attempts = count_recent_failed_attempts(username)
-
-        if failed_attempts == 5:
-            create_security_alert(
-                "Brute Force Attempt",
-                "HIGH",
-                f"Five failed login attempts detected for username '{username}' within 10 minutes."
-            )
-
-        failed_ip_attempts = count_recent_failed_attempts_by_ip(ip_address)
-
-        if failed_ip_attempts == 10:
-            create_security_alert(
-                "Suspicious IP Activity",
-                "HIGH",
-                f"Ten failed login attempts detected from IP address '{ip_address}' within 10 minutes."
-            )
+        analyze_failed_login(username, ip_address)
 
         return "Invalid username or password."
     

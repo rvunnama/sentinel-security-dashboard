@@ -9,7 +9,8 @@ from database import (
     count_recent_failed_attempts,
     create_security_alert,
     get_recent_security_alerts,
-    get_dashboard_stats
+    get_dashboard_stats,
+    count_recent_failed_attempts_by_ip
 )
 import sqlite3
 
@@ -63,6 +64,15 @@ def login():
                 "Brute Force Attempt",
                 "HIGH",
                 f"Five failed login attempts detected for username '{username}' within 10 minutes."
+            )
+
+        failed_ip_attempts = count_recent_failed_attempts_by_ip(ip_address)
+
+        if failed_ip_attempts == 10:
+            create_security_alert(
+                "Suspicious IP Activity",
+                "HIGH",
+                f"Ten failed login attempts detected from IP address '{ip_address}' within 10 minutes."
             )
 
         return "Invalid username or password."

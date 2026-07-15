@@ -171,3 +171,24 @@ def get_dashboard_stats():
         "failed_logins": failed_logins,
         "total_alerts": total_alerts
     }
+
+def count_recent_failed_attempts_by_ip(ip_address):
+    connection = sqlite3.connect("sentinel.db")
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT COUNT(*)
+        FROM login_attempts
+        WHERE ip_address = ?
+        AND success = 0
+        AND timestamp >= datetime('now', '-10 minutes')
+        """,
+        (ip_address,)
+    )
+
+    count = cursor.fetchone()[0]
+
+    connection.close()
+
+    return count

@@ -4,22 +4,25 @@
 
     <p>Welcome, {{ username }}!</p>
 
-<div class="stats-container">
-    <div class="stat-card">
-        <h3>Successful Logins</h3>
-        <p>{{ stats["successful_logins"] }}</p>
-    </div>
+    <div class="stats-container">
+        <div class="stat-card">
+            <h3>Successful Logins</h3>
+            <p>{{ stats["successful_logins"] }}</p>
+            <span>Last 24 hours</span>
+        </div>
 
-    <div class="stat-card">
-        <h3>Failed Logins</h3>
-        <p>{{ stats["failed_logins"] }}</p>
-    </div>
+        <div class="stat-card">
+            <h3>Failed Logins</h3>
+            <p>{{ stats["failed_logins"] }}</p>
+            <span>Last 24 hours</span>
+        </div>
 
-    <div class="stat-card">
-        <h3>Security Alerts</h3>
-        <p>{{ stats["total_alerts"] }}</p>
+        <div class="stat-card">
+            <h3>Security Alerts</h3>
+            <p>{{ stats["total_alerts"] }}</p>
+            <span>Last 24 hours</span>
+        </div>
     </div>
-</div>
 
     <h2>Recent Login Activity</h2>
 
@@ -78,7 +81,7 @@
                 Resolved
             </a>
         </div>
-        
+
         <div class="filters">
             <h3>Severity</h3>
 

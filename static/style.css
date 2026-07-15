@@ -41,6 +41,11 @@ body {
     margin-bottom: 0;
 }
 
+.stat-card span {
+    font-size: 13px;
+    color: #666;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;

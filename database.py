@@ -137,6 +137,7 @@ def get_dashboard_stats():
             SELECT COUNT(*)
             FROM login_attempts
             WHERE success = 1
+            AND timestamp >= datetime('now', '-24 hours')
         """)
         successful_logins = cursor.fetchone()[0]
 
@@ -144,12 +145,14 @@ def get_dashboard_stats():
             SELECT COUNT(*)
             FROM login_attempts
             WHERE success = 0
+            AND timestamp >= datetime('now', '-24 hours')
         """)
         failed_logins = cursor.fetchone()[0]
 
         cursor.execute("""
             SELECT COUNT(*)
             FROM security_alerts
+            WHERE timestamp >= datetime('now', '-24 hours')
         """)
         total_alerts = cursor.fetchone()[0]
 

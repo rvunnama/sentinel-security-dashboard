@@ -9,7 +9,8 @@ from database import (
     get_recent_security_alerts,
     get_dashboard_stats,
     resolve_security_alert,
-    get_login_activity_chart_data
+    get_login_activity_chart_data,
+    get_current_threat_level
 )
 from detection import analyze_failed_login
 import sqlite3
@@ -92,6 +93,8 @@ def dashboard():
         failed_chart_data
     ) = get_login_activity_chart_data()
 
+    threat_level = get_current_threat_level()
+
     return render_template(
         "dashboard.html",
         username=session["username"],
@@ -102,7 +105,8 @@ def dashboard():
         severity_filter=severity_filter,
         chart_labels=chart_labels,
         successful_chart_data=successful_chart_data,
-        failed_chart_data=failed_chart_data
+        failed_chart_data=failed_chart_data,
+        threat_level=threat_level
     )
 
 @app.route("/logout")

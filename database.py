@@ -194,7 +194,7 @@ def resolve_security_alert(alert_id):
             """,
             (alert_id,)
         )
-        
+
 def get_login_activity_chart_data():
     with sqlite3.connect("sentinel.db", timeout=10) as connection:
         cursor = connection.cursor()
@@ -248,3 +248,24 @@ def get_login_activity_chart_data():
         failed.append(data["failed"])
 
     return labels, successful, failed
+
+def get_current_threat_level():
+    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM security_alerts
+            WHERE status = 'OPEN'
+        """)
+
+        open_alerts = cursor.fetchone()[0]
+
+    if open_alerts == 0:
+        return "LOW"
+
+    elif open_alerts <= 2:
+        return "MEDIUM"
+
+    else:
+        return "HIGH"

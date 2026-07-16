@@ -1,43 +1,112 @@
+:root {
+    --background: #080c14;
+    --surface: #111827;
+    --surface-light: #182233;
+    --border: #263247;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent: #38bdf8;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+}
+
 body {
-    background-color: #f4f6f9;
     min-height: 100vh;
+    margin: 0;
+    background:
+        radial-gradient(circle at top right, #132238 0, transparent 35%),
+        var(--background);
+    color: var(--text-primary);
+}
+
+.navbar {
+    background-color: rgba(8, 12, 20, 0.95) !important;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
 }
 
 .navbar-brand {
-    letter-spacing: 0.08em;
+    color: var(--accent) !important;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
 }
 
-.card {
-    border-radius: 14px;
+.text-secondary {
+    color: var(--text-secondary) !important;
 }
 
-.stat-card,
 .card {
+    background-color: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border) !important;
+    border-radius: 14px;
     transition:
         transform 0.2s ease,
+        border-color 0.2s ease,
         box-shadow 0.2s ease;
 }
 
 .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(56, 189, 248, 0.45) !important;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28) !important;
 }
 
-table th {
+.stat-card-number {
+    color: var(--text-primary);
+}
+
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text-primary);
+    --bs-table-border-color: var(--border);
+    --bs-table-hover-bg: var(--surface-light);
+    --bs-table-hover-color: var(--text-primary);
+}
+
+.table thead th {
+    color: var(--text-secondary);
+    border-bottom-color: var(--border);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
     white-space: nowrap;
 }
 
-table td {
+.table td {
     vertical-align: middle;
 }
 
+.btn-outline-secondary {
+    color: var(--text-secondary);
+    border-color: var(--border);
+}
+
+.btn-outline-secondary:hover {
+    color: var(--text-primary);
+    background-color: var(--surface-light);
+    border-color: var(--accent);
+}
+
+.btn-dark {
+    background-color: var(--accent);
+    color: #05111d;
+    border: none;
+    font-weight: 600;
+}
+
+.btn-dark:hover {
+    background-color: #7dd3fc;
+    color: #05111d;
+}
+
 code {
-    color: inherit;
+    color: var(--accent);
 }
 
 .chart-container {
     position: relative;
-    height: 340px;
     width: 100%;
+    height: 340px;
 }

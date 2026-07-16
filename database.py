@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime, timedelta
 
 def create_database():
     with sqlite3.connect("sentinel.db", timeout=10) as connection:
@@ -193,7 +194,7 @@ def resolve_security_alert(alert_id):
             """,
             (alert_id,)
         )
-
+        
 def get_login_activity_chart_data():
     with sqlite3.connect("sentinel.db", timeout=10) as connection:
         cursor = connection.cursor()
@@ -202,8 +203,8 @@ def get_login_activity_chart_data():
             """
             SELECT
                 strftime('%Y-%m-%d %H:00', timestamp) AS hour,
-                SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) AS successful,
-                SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) AS failed
+                SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END),
+                SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END)
             FROM login_attempts
             WHERE timestamp >= datetime('now', '-24 hours')
             GROUP BY hour
@@ -211,4 +212,39 @@ def get_login_activity_chart_data():
             """
         )
 
-        return cursor.fetchall()
+        rows = cursor.fetchall()
+
+    activity_by_hour = {
+        row[0]: {
+            "successful": row[1],
+            "failed": row[2]
+        }
+        for row in rows
+    }
+
+    now = datetime.utcnow().replace(
+        minute=0,
+        second=0,
+        microsecond=0
+    )
+
+    labels = []
+    successful = []
+    failed = []
+
+    for hours_ago in range(23, -1, -1):
+        hour = now - timedelta(hours=hours_ago)
+        database_hour = hour.strftime("%Y-%m-%d %H:00")
+        display_hour = hour.strftime("%-I %p")
+
+        labels.append(display_hour)
+
+        data = activity_by_hour.get(
+            database_hour,
+            {"successful": 0, "failed": 0}
+        )
+
+        successful.append(data["successful"])
+        failed.append(data["failed"])
+
+    return labels, successful, failed

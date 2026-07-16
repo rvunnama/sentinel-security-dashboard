@@ -86,11 +86,11 @@ def dashboard():
 
     stats = get_dashboard_stats()
 
-    chart_rows = get_login_activity_chart_data()
-
-    chart_labels = [row[0] for row in chart_rows]
-    successful_chart_data = [row[1] for row in chart_rows]
-    failed_chart_data = [row[2] for row in chart_rows]
+    (
+        chart_labels,
+        successful_chart_data,
+        failed_chart_data
+    ) = get_login_activity_chart_data()
 
     return render_template(
         "dashboard.html",

@@ -1,139 +1,358 @@
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sentinel Dashboard</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
 <body>
-    <h1>Sentinel Dashboard</h1>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ url_for('dashboard') }}">
+                Sentinel
+            </a>
 
-    <p>Welcome, {{ username }}!</p>
+            <div class="d-flex align-items-center gap-3">
+                <span class="text-light">
+                    {{ username }}
+                </span>
 
-    <div class="stats-container">
-        <div class="stat-card">
-            <h3>Successful Logins</h3>
-            <p>{{ stats["successful_logins"] }}</p>
-            <span>Last 24 hours</span>
+                <a
+                    class="btn btn-outline-light btn-sm"
+                    href="{{ url_for('logout') }}"
+                >
+                    Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        <div class="mb-4">
+            <h1 class="fw-bold">Security Dashboard</h1>
+            <p class="text-secondary mb-0">
+                Monitor authentication activity and investigate security alerts.
+            </p>
         </div>
 
-        <div class="stat-card">
-            <h3>Failed Logins</h3>
-            <p>{{ stats["failed_logins"] }}</p>
-            <span>Last 24 hours</span>
-        </div>
+        <section class="row g-4 mb-5">
+            <div class="col-12 col-md-4">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-body">
+                        <p class="text-secondary mb-2">
+                            Successful Logins
+                        </p>
 
-        <div class="stat-card">
-            <h3>Security Alerts</h3>
-            <p>{{ stats["total_alerts"] }}</p>
-            <span>Last 24 hours</span>
-        </div>
-    </div>
+                        <h2 class="display-5 fw-bold mb-1">
+                            {{ stats["successful_logins"] }}
+                        </h2>
 
-    <h2>Recent Login Activity</h2>
+                        <span class="small text-secondary">
+                            Last 24 hours
+                        </span>
+                    </div>
+                </div>
+            </div>
 
-    <table border="1">
-        <tr>
-            <th>Username</th>
-            <th>Status</th>
-            <th>Timestamp</th>
-            <th>IP Address</th>
-        </tr>
+            <div class="col-12 col-md-4">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-body">
+                        <p class="text-secondary mb-2">
+                            Failed Logins
+                        </p>
 
-        {% for attempt in attempts %}
-        <tr>
-            <td>{{ attempt[0] }}</td>
+                        <h2 class="display-5 fw-bold mb-1">
+                            {{ stats["failed_logins"] }}
+                        </h2>
 
-            <td>
-                {% if attempt[1] == 1 %}
-                    Success
-                {% else %}
-                    Failed
-                {% endif %}
-            </td>
+                        <span class="small text-secondary">
+                            Last 24 hours
+                        </span>
+                    </div>
+                </div>
+            </div>
 
-            <td>{{ attempt[2] }}</td>
-            <td>{{ attempt[3] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+            <div class="col-12 col-md-4">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-body">
+                        <p class="text-secondary mb-2">
+                            Security Alerts
+                        </p>
 
-    <br>
+                        <h2 class="display-5 fw-bold mb-1">
+                            {{ stats["total_alerts"] }}
+                        </h2>
 
-    <h2>Security Alerts</h2>
-        <div class="filters">
-            <a href="{{ url_for('dashboard') }}">All</a>
+                        <span class="small text-secondary">
+                            Last 24 hours
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-            <a href="{{ url_for('dashboard', status='OPEN') }}">
-                Open
-            </a>
+        <section class="card shadow-sm border-0 mb-5">
+            <div class="card-body">
+                <div
+                    class="d-flex flex-column flex-lg-row
+                           justify-content-between gap-3 mb-4"
+                >
+                    <div>
+                        <h2 class="h4 mb-1">Security Alerts</h2>
+                        <p class="text-secondary mb-0">
+                            Review, filter, and resolve detected threats.
+                        </p>
+                    </div>
+                </div>
 
-            <a href="{{ url_for('dashboard', status='RESOLVED') }}">
-                Resolved
-            </a>
-        </div>
-        <div class="filters">
-            <h3>Status</h3>
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-lg-6">
+                        <p class="fw-semibold mb-2">Status</p>
 
-            <a href="{{ url_for('dashboard', severity=severity_filter) }}">
-                All
-            </a>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a
+                                class="btn btn-sm btn-outline-secondary"
+                                href="{{ url_for(
+                                    'dashboard',
+                                    severity=severity_filter
+                                ) }}"
+                            >
+                                All
+                            </a>
 
-            <a href="{{ url_for('dashboard', status='OPEN', severity=severity_filter) }}">
-                Open
-            </a>
+                            <a
+                                class="btn btn-sm btn-outline-secondary"
+                                href="{{ url_for(
+                                    'dashboard',
+                                    status='OPEN',
+                                    severity=severity_filter
+                                ) }}"
+                            >
+                                Open
+                            </a>
 
-            <a href="{{ url_for('dashboard', status='RESOLVED', severity=severity_filter) }}">
-                Resolved
-            </a>
-        </div>
+                            <a
+                                class="btn btn-sm btn-outline-secondary"
+                                href="{{ url_for(
+                                    'dashboard',
+                                    status='RESOLVED',
+                                    severity=severity_filter
+                                ) }}"
+                            >
+                                Resolved
+                            </a>
+                        </div>
+                    </div>
 
-        <div class="filters">
-            <h3>Severity</h3>
+                    <div class="col-12 col-lg-6">
+                        <p class="fw-semibold mb-2">Severity</p>
 
-            <a href="{{ url_for('dashboard', status=status_filter) }}">
-                All
-            </a>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a
+                                class="btn btn-sm btn-outline-secondary"
+                                href="{{ url_for(
+                                    'dashboard',
+                                    status=status_filter
+                                ) }}"
+                            >
+                                All
+                            </a>
 
-            <a href="{{ url_for('dashboard', status=status_filter, severity='HIGH') }}">
-                High
-            </a>
+                            <a
+                                class="btn btn-sm btn-outline-danger"
+                                href="{{ url_for(
+                                    'dashboard',
+                                    status=status_filter,
+                                    severity='HIGH'
+                                ) }}"
+                            >
+                                High
+                            </a>
 
-            <a href="{{ url_for('dashboard', status=status_filter, severity='MEDIUM') }}">
-                Medium
-            </a>
+                            <a
+                                class="btn btn-sm btn-outline-warning"
+                                href="{{ url_for(
+                                    'dashboard',
+                                    status=status_filter,
+                                    severity='MEDIUM'
+                                ) }}"
+                            >
+                                Medium
+                            </a>
 
-            <a href="{{ url_for('dashboard', status=status_filter, severity='LOW') }}">
-                Low
-            </a>
-        </div>
-    <table>
-        <tr>
-            <th>Alert Type</th>
-            <th>Severity</th>
-            <th>Description</th>
-            <th>Timestamp</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
+                            <a
+                                class="btn btn-sm btn-outline-success"
+                                href="{{ url_for(
+                                    'dashboard',
+                                    status=status_filter,
+                                    severity='LOW'
+                                ) }}"
+                            >
+                                Low
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
-        {% for alert in alerts %}
-        <tr>
-            <td>{{ alert[1] }}</td>
-            <td>{{ alert[2] }}</td>
-            <td>{{ alert[3] }}</td>
-            <td>{{ alert[4] }}</td>
-            <td>{{ alert[5] }}</td>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Alert Type</th>
+                                <th>Severity</th>
+                                <th>Description</th>
+                                <th>Timestamp</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
 
-            <td>
-                {% if alert[5] == "OPEN" %}
-                    <form
-                        method="POST"
-                        action="{{ url_for('resolve_alert', alert_id=alert[0]) }}"
-                    >
-                        <button type="submit">Resolve</button>
-                    </form>
-                {% else %}
-                    Resolved
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+                        <tbody>
+                            {% for alert in alerts %}
+                            <tr>
+                                <td class="fw-semibold">
+                                    {{ alert[1] }}
+                                </td>
 
-    <a href="{{ url_for('logout') }}">Logout</a>
+                                <td>
+                                    {% if alert[2] == "HIGH" %}
+                                        <span class="badge text-bg-danger">
+                                            HIGH
+                                        </span>
+                                    {% elif alert[2] == "MEDIUM" %}
+                                        <span class="badge text-bg-warning">
+                                            MEDIUM
+                                        </span>
+                                    {% else %}
+                                        <span class="badge text-bg-success">
+                                            LOW
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>{{ alert[3] }}</td>
+                                <td>{{ alert[4] }}</td>
+
+                                <td>
+                                    {% if alert[5] == "OPEN" %}
+                                        <span class="badge text-bg-primary">
+                                            OPEN
+                                        </span>
+                                    {% else %}
+                                        <span class="badge text-bg-secondary">
+                                            RESOLVED
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if alert[5] == "OPEN" %}
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'resolve_alert',
+                                                alert_id=alert[0]
+                                            ) }}"
+                                        >
+                                            <button
+                                                type="submit"
+                                                class="btn btn-sm btn-dark"
+                                            >
+                                                Resolve
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-secondary">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td
+                                    colspan="6"
+                                    class="text-center text-secondary py-4"
+                                >
+                                    No alerts match the selected filters.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="mb-4">
+                    <h2 class="h4 mb-1">Recent Login Activity</h2>
+                    <p class="text-secondary mb-0">
+                        The ten most recent authentication attempts.
+                    </p>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Status</th>
+                                <th>Timestamp</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for attempt in attempts %}
+                            <tr>
+                                <td class="fw-semibold">
+                                    {{ attempt[0] }}
+                                </td>
+
+                                <td>
+                                    {% if attempt[1] == 1 %}
+                                        <span class="badge text-bg-success">
+                                            Success
+                                        </span>
+                                    {% else %}
+                                        <span class="badge text-bg-danger">
+                                            Failed
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>{{ attempt[2] }}</td>
+                                <td>
+                                    <code>{{ attempt[3] }}</code>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td
+                                    colspan="4"
+                                    class="text-center text-secondary py-4"
+                                >
+                                    No login activity has been recorded.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
 </body>
+</html>

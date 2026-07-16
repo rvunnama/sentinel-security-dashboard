@@ -10,7 +10,10 @@ from database import (
     get_dashboard_stats,
     resolve_security_alert,
     get_login_activity_chart_data,
-    get_current_threat_level
+    get_current_threat_level,
+    get_top_targeted_usernames,
+    get_top_targeted_ip_addresses,
+    get_alert_severity_distribution
 )
 from detection import analyze_failed_login
 import sqlite3
@@ -95,6 +98,12 @@ def dashboard():
 
     threat_level = get_current_threat_level()
 
+    top_usernames = get_top_targeted_usernames()
+
+    top_ip_addresses = get_top_targeted_ip_addresses()
+
+    alert_severity_labels, alert_severity_counts = get_alert_severity_distribution()
+
     return render_template(
         "dashboard.html",
         username=session["username"],
@@ -106,7 +115,11 @@ def dashboard():
         chart_labels=chart_labels,
         successful_chart_data=successful_chart_data,
         failed_chart_data=failed_chart_data,
-        threat_level=threat_level
+        threat_level=threat_level,
+        top_usernames=top_usernames,
+        top_ip_addresses=top_ip_addresses,
+        alert_severity_labels=alert_severity_labels,
+        alert_severity_counts=alert_severity_counts
     )
 
 @app.route("/logout")

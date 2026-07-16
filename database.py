@@ -269,3 +269,63 @@ def get_current_threat_level():
 
     else:
         return "HIGH"
+
+def get_top_targeted_usernames(limit=5):
+    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT username, COUNT(*) AS failed_attempts
+            FROM login_attempts
+            WHERE success = 0
+            AND timestamp >= datetime('now', '-24 hours')
+            GROUP BY username
+            ORDER BY failed_attempts DESC
+            LIMIT ?
+            """,
+            (limit,)
+        )
+
+        return cursor.fetchall()
+
+def get_top_targeted_ip_addresses(limit=5):
+    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT ip_address, COUNT(*) AS failed_attempts
+            FROM login_attempts
+            WHERE success = 0
+            AND timestamp >= datetime('now', '-24 hours')
+            GROUP BY ip_address
+            ORDER BY failed_attempts DESC
+            LIMIT ?
+            """,
+            (limit,)
+        )
+
+        return cursor.fetchall()
+
+def get_alert_severity_distribution():
+    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            SELECT severity, COUNT(*) AS total
+            FROM security_alerts
+            GROUP BY severity
+            ORDER BY total DESC
+        """)
+
+        rows = cursor.fetchall()
+
+        labels = []
+        counts = []
+
+        for row in rows:
+            labels.append(row[0])
+            counts.append(row[1])
+
+        return labels, counts

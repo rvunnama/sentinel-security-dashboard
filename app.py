@@ -8,7 +8,8 @@ from database import (
     get_recent_login_attempts,
     get_recent_security_alerts,
     get_dashboard_stats,
-    resolve_security_alert
+    resolve_security_alert,
+    get_login_activity_chart_data
 )
 from detection import analyze_failed_login
 import sqlite3
@@ -85,6 +86,12 @@ def dashboard():
 
     stats = get_dashboard_stats()
 
+    chart_rows = get_login_activity_chart_data()
+
+    chart_labels = [row[0] for row in chart_rows]
+    successful_chart_data = [row[1] for row in chart_rows]
+    failed_chart_data = [row[2] for row in chart_rows]
+
     return render_template(
         "dashboard.html",
         username=session["username"],
@@ -92,7 +99,10 @@ def dashboard():
         alerts=alerts,
         stats=stats,
         status_filter=status_filter,
-        severity_filter=severity_filter
+        severity_filter=severity_filter,
+        chart_labels=chart_labels,
+        successful_chart_data=successful_chart_data,
+        failed_chart_data=failed_chart_data
     )
 
 @app.route("/logout")

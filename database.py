@@ -193,3 +193,22 @@ def resolve_security_alert(alert_id):
             """,
             (alert_id,)
         )
+
+def get_login_activity_chart_data():
+    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+        cursor = connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT
+                strftime('%Y-%m-%d %H:00', timestamp) AS hour,
+                SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) AS successful,
+                SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) AS failed
+            FROM login_attempts
+            WHERE timestamp >= datetime('now', '-24 hours')
+            GROUP BY hour
+            ORDER BY hour ASC
+            """
+        )
+
+        return cursor.fetchall()

@@ -35,3 +35,9 @@ table td {
 code {
     color: inherit;
 }
+
+.chart-container {
+    position: relative;
+    height: 340px;
+    width: 100%;
+}

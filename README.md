@@ -60,7 +60,7 @@ https://github.com/rvunnama/sentinel-security-dashboard
 ...
 
 sentinel-security-dashboard/
-|
+│
 ├── app.py
 ├── database.py
 ├── requirements.txt

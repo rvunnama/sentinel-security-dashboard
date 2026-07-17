@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import (
     create_database,
@@ -13,16 +13,29 @@ from database import (
     get_current_threat_level,
     get_top_targeted_usernames,
     get_top_targeted_ip_addresses,
-    get_alert_severity_distribution
+    get_alert_severity_distribution,
+    has_successful_login_from_ip,
+    create_security_alert
 )
 from detection import analyze_failed_login
 import sqlite3
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = "development-secret-key"
+
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "development-secret-key"
+)
 
 @app.route("/")
 def home():
+    if "user_id" in session:
+        return redirect(url_for("dashboard"))
+
     return render_template("index.html")
 
 @app.route("/register", methods=["GET", "POST"])
@@ -35,10 +48,18 @@ def register():
 
         try:
             add_user(username, password_hash)
-            return "Account created successfully!"
+            flash(
+                "Account created successfully. You can now sign in.",
+                "success"
+            )
+            return redirect(url_for("login"))
 
         except sqlite3.IntegrityError:
-            return "That username is already taken."
+            flash(
+                "That username is already taken. Please choose another.",
+                "danger"
+            )
+            return render_template("register.html")
 
     return render_template("register.html")
 
@@ -52,10 +73,22 @@ def login():
         user = get_user_by_username(username)
 
         if user and check_password_hash(user[2], password):
-            log_login_attempt(username, 1, ip_address)
+            user_id = user[0]
 
-            session["user_id"] = user[0]
-            session["username"] = user[1]
+            known_ip = has_successful_login_from_ip(username, ip_address)
+
+            log_login_attempt(username, True, ip_address)
+
+            if not known_ip:
+                create_security_alert(
+                    "New Login Location",
+                    "LOW",
+                    f"Successful login for username '{username}' "
+                    f"from a previously unseen IP address: {ip_address}."
+                )
+
+            session["user_id"] = user_id
+            session["username"] = username
 
             return redirect(url_for("dashboard"))
 
@@ -63,7 +96,7 @@ def login():
 
         analyze_failed_login(username, ip_address)
 
-        return "Invalid username or password."
+        flash("Invalid username or password. Please try again.", "danger")
     
     return render_template("login.html")
 

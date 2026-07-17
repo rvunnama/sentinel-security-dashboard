@@ -1,9 +1,30 @@
 import sqlite3
 from datetime import datetime, timedelta
+import os
+
+DATABASE_PATH = os.environ.get("SENTINEL_DATABASE_PATH", "sentinel.db")
 
 def create_database():
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL
+            )
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS login_attempts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL,
+                success INTEGER NOT NULL,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                ip_address TEXT NOT NULL
+            )
+        """)
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS security_alerts (
@@ -17,7 +38,7 @@ def create_database():
         """)
 
 def add_user(username, password_hash):
-    with sqlite3.connect("sentinel.db") as connection:
+    with sqlite3.connect(DATABASE_PATH) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -26,7 +47,7 @@ def add_user(username, password_hash):
         )
 
 def get_user_by_username(username):
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -39,7 +60,7 @@ def get_user_by_username(username):
         return user
 
 def log_login_attempt(username, success, ip_address):
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -51,7 +72,7 @@ def log_login_attempt(username, success, ip_address):
         )
 
 def get_recent_login_attempts(limit=10):
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -69,7 +90,7 @@ def get_recent_login_attempts(limit=10):
         return attempts
 
 def count_recent_failed_attempts(username):
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -88,7 +109,7 @@ def count_recent_failed_attempts(username):
         return count
 
 def create_security_alert(alert_type, severity, description):
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -104,7 +125,7 @@ def create_security_alert(alert_type, severity, description):
         )
 
 def get_recent_security_alerts(limit=10, status=None, severity=None):
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         query = """
@@ -131,7 +152,7 @@ def get_recent_security_alerts(limit=10, status=None, severity=None):
         return cursor.fetchall()
 
 def get_dashboard_stats():
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute("""
@@ -164,7 +185,7 @@ def get_dashboard_stats():
         }
 
 def count_recent_failed_attempts_by_ip(ip_address):
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -183,7 +204,7 @@ def count_recent_failed_attempts_by_ip(ip_address):
         return count
 
 def resolve_security_alert(alert_id):
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -196,7 +217,7 @@ def resolve_security_alert(alert_id):
         )
 
 def get_login_activity_chart_data():
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -250,7 +271,7 @@ def get_login_activity_chart_data():
     return labels, successful, failed
 
 def get_current_threat_level():
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute("""
@@ -271,7 +292,7 @@ def get_current_threat_level():
         return "HIGH"
 
 def get_top_targeted_usernames(limit=5):
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -290,7 +311,7 @@ def get_top_targeted_usernames(limit=5):
         return cursor.fetchall()
 
 def get_top_targeted_ip_addresses(limit=5):
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
@@ -309,7 +330,7 @@ def get_top_targeted_ip_addresses(limit=5):
         return cursor.fetchall()
 
 def get_alert_severity_distribution():
-    with sqlite3.connect("sentinel.db", timeout=10) as connection:
+    with sqlite3.connect(DATABASE_PATH, timeout=10) as connection:
         cursor = connection.cursor()
 
         cursor.execute("""
@@ -329,3 +350,24 @@ def get_alert_severity_distribution():
             counts.append(row[1])
 
         return labels, counts
+
+def has_successful_login_from_ip(username, ip_address):
+    connection = sqlite3.connect(DATABASE_PATH)
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT 1
+        FROM login_attempts
+        WHERE username = ?
+          AND ip_address = ?
+          AND success = 1
+        LIMIT 1
+        """,
+        (username, ip_address)
+    )
+
+    result = cursor.fetchone()
+    connection.close()
+
+    return result is not None

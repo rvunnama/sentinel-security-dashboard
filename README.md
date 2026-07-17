@@ -9,7 +9,7 @@ Sentinel is a Flask-based cybersecurity dashboard that monitors authentication a
 Live Demo: *(Coming Soon)*
 
 GitHub Repository:
-https://github.com/yourusername/sentinel-security-dashboard
+https://github.com/rvunnama/sentinel-security-dashboard
 
 ---
 
@@ -81,7 +81,7 @@ sentinel-security-dashboard/
 Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/sentinel-security-dashboard.git
+git clone https://github.com/rvunnama/sentinel-security-dashboard.git
 ```
 
 Navigate into the project

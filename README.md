@@ -6,7 +6,8 @@ Sentinel is a Flask-based cybersecurity dashboard that monitors authentication a
 
 ## Demo
 
-Live Demo: *(Coming Soon)*
+Live Demo:
+https://sentinel-security-dashboard.onrender.com
 
 GitHub Repository:
 https://github.com/rvunnama/sentinel-security-dashboard
